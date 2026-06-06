@@ -29,19 +29,21 @@ app = FastAPI(
     version="1.0.0",
 )
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "").strip().rstrip("/")
 
 allowed_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://ai-research-copilot-iota.vercel.app",
 ]
 
-if FRONTEND_URL:
+if FRONTEND_URL and FRONTEND_URL not in allowed_origins:
     allowed_origins.append(FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -57,6 +59,7 @@ def home():
         "success": True,
         "message": "AI Research Copilot backend is running",
         "docs": "/docs",
+        "allowed_origins": allowed_origins,
     }
 
 
