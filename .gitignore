@@ -1,0 +1,26 @@
+# Python
+backend/.venv/
+__pycache__/
+*.pyc
+
+# Vector DB
+backend/faiss_index/
+
+# Uploads
+backend/uploads/
+
+# Environment Variables
+.env
+
+# React
+frontend/node_modules/
+
+# Build files
+frontend/dist/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
