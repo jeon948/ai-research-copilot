@@ -6,15 +6,24 @@ from multi_pdf_store import get_all_documents
 
 load_dotenv()
 
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    temperature=0.3
-)
+llm = None
+
+
+def get_llm():
+    global llm
+
+    if llm is None:
+        llm = ChatGroq(
+            model="llama-3.1-8b-instant",
+            temperature=0.3
+        )
+
+    return llm
 
 
 def ask_groq(question):
     try:
-        response = llm.invoke(question)
+        response = get_llm().invoke(question)
         return response.content
     except Exception as e:
         return f"Groq API Error: {str(e)}"
@@ -26,7 +35,8 @@ def get_context(query):
     if not docs:
         return None
 
-    return "\n\n".join([doc.page_content for doc in docs])
+    context = "\n\n".join([doc.page_content for doc in docs])
+    return context[:12000]
 
 
 def chatgpt_style_prompt(task, context, user_question=None):
@@ -78,7 +88,7 @@ def ask_document(question):
             user_question=question
         )
 
-        response = llm.invoke(prompt)
+        response = get_llm().invoke(prompt)
         return response.content
 
     except Exception as e:
@@ -107,7 +117,7 @@ Format:
             context=context
         )
 
-        response = llm.invoke(prompt)
+        response = get_llm().invoke(prompt)
         return response.content
 
     except Exception as e:
@@ -139,7 +149,7 @@ Rules:
             context=context
         )
 
-        response = llm.invoke(prompt)
+        response = get_llm().invoke(prompt)
         return response.content
 
     except Exception as e:
@@ -168,7 +178,7 @@ Format neatly.
             context=context
         )
 
-        response = llm.invoke(prompt)
+        response = get_llm().invoke(prompt)
         return response.content
 
     except Exception as e:
@@ -199,7 +209,7 @@ Make it easy to study before exams.
             context=context
         )
 
-        response = llm.invoke(prompt)
+        response = get_llm().invoke(prompt)
         return response.content
 
     except Exception as e:
@@ -229,7 +239,7 @@ Make it useful for students.
             context=context
         )
 
-        response = llm.invoke(prompt)
+        response = get_llm().invoke(prompt)
         return response.content
 
     except Exception as e:
@@ -261,7 +271,7 @@ Keep it concise but useful.
             context=context
         )
 
-        response = llm.invoke(prompt)
+        response = get_llm().invoke(prompt)
         return response.content
 
     except Exception as e:
@@ -278,7 +288,9 @@ def compare_documents():
         context = ""
 
         for filename, text in documents.items():
-            context += f"\n\n--- Document: {filename} ---\n{text[:7000]}"
+            context += f"\n\n--- Document: {filename} ---\n{text[:4000]}"
+
+        context = context[:12000]
 
         prompt = f"""
 You are a helpful AI Research Copilot, similar to ChatGPT.
@@ -299,7 +311,7 @@ Format:
 Use simple, clear language.
 """
 
-        response = llm.invoke(prompt)
+        response = get_llm().invoke(prompt)
         return response.content
 
     except Exception as e:
